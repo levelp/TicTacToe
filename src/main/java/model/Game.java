@@ -7,15 +7,15 @@ public class Game {
 
 
     /**
-     * Размер поля
-     */
-    final int size;
-    /**
      * Поле игры
      * Координаты отсчитываем от
      * верхнего левого угла
      */
-    final Cell[][] field;
+    public final Cell[][] field;
+    /**
+     * Размер поля
+     */
+    final int size;
     /**
      * Состояние игры
      */
@@ -56,13 +56,29 @@ public class Game {
         switch (state) {
             case X_MOVE:
                 field[x][y] = Cell.X;
+                state = State.O_MOVE;
                 break;
             case O_MOVE:
                 field[x][y] = Cell.O;
+                state = State.O_MOVE;
                 break;
             default:
                 throw new UserException("Ход невозможен!");
         }
+    }
+
+    public void move(Move move) throws UserException {
+        move(move.x, move.y);
+    }
+
+    public boolean isOver() {
+        return state == State.X_WINS ||
+                state == State.O_WINS ||
+                state == State.DRAW;
+    }
+
+    public State getState() {
+        return state;
     }
 
     public enum State {
@@ -76,6 +92,11 @@ public class Game {
 
         State(String name) {
             this.name = name;
+        }
+
+        @Override
+        public String toString() {
+            return name;
         }
     }
 }

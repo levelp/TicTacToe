@@ -1,6 +1,8 @@
 package view.swing;
 
 import model.Game;
+import model.Move;
+import model.UserException;
 import view.GameView;
 
 import javax.swing.*;
@@ -18,6 +20,14 @@ public class SwingView implements GameView {
     }
 
     public void render(Game game) {
+
+    }
+
+    public Move inputMove() {
+        return null;
+    }
+
+    public void reportError(UserException e) {
 
     }
 }
