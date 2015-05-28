@@ -1,5 +1,8 @@
 package model;
 
+import java.util.ArrayList;
+import java.util.List;
+
 /**
  * Состояние игры
  */
@@ -10,12 +13,11 @@ public class Game {
      * верхнего левого угла
      */
     public final Cell[][] field;
-
+    public final List<GameUpdateListener> listeners = new ArrayList<>();
     /**
      * Размер поля
      */
     final int size;
-
     /**
      * Состояние игры
      */
@@ -58,15 +60,22 @@ public class Game {
                 field[x][y] = Cell.X;
                 state = State.O_MOVE;
                 updateGameState(Cell.X);
+                notifyListeners();
                 break;
             case O_MOVE:
                 field[x][y] = Cell.O;
                 state = State.X_MOVE;
                 updateGameState(Cell.O);
+                notifyListeners();
                 break;
             default:
                 throw new UserException("Ход невозможен!");
         }
+    }
+
+    private void notifyListeners() {
+        for (GameUpdateListener listener : listeners)
+            listener.update(state);
     }
 
     /**

@@ -11,16 +11,17 @@ import javax.swing.*;
  * Отображение игры в Swing интерфейсе
  */
 public class SwingView implements GameView {
-    public SwingView() {
+
+    public SwingView(Game game) {
         JFrame frame = new JFrame("Игра Крестики-нолики");
-        frame.setContentPane(new MainForm().panel);
+        MainForm mainForm = new MainForm(game);
+        frame.setContentPane(mainForm.panel);
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         frame.pack();
         frame.setVisible(true);
     }
 
     public void render(Game game) {
-
     }
 
     public Move inputMove() {
@@ -28,6 +29,5 @@ public class SwingView implements GameView {
     }
 
     public void reportError(UserException e) {
-
     }
 }
