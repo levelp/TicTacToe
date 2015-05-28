@@ -3,6 +3,6 @@ package model;
 /**
  * Состояние клетки поля
  */
-public enum CellState {
+public enum Cell {
     X, O, EMPTY
 }
