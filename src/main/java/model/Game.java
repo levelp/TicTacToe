@@ -4,18 +4,18 @@ package model;
  * Состояние игры
  */
 public class Game {
-
-
     /**
      * Поле игры
      * Координаты отсчитываем от
      * верхнего левого угла
      */
     public final Cell[][] field;
+
     /**
      * Размер поля
      */
     final int size;
+
     /**
      * Состояние игры
      */
@@ -57,13 +57,100 @@ public class Game {
             case X_MOVE:
                 field[x][y] = Cell.X;
                 state = State.O_MOVE;
+                updateGameState(Cell.X);
                 break;
             case O_MOVE:
                 field[x][y] = Cell.O;
-                state = State.O_MOVE;
+                state = State.X_MOVE;
+                updateGameState(Cell.O);
                 break;
             default:
                 throw new UserException("Ход невозможен!");
+        }
+    }
+
+    /**
+     * Проверка на окончание игры
+     *
+     * @param lastMove чей был последний ход?
+     */
+    void updateGameState(Cell lastMove) {
+        // Проверяем на выйгрыш
+        // Горизонтальные строки
+        for (int y = 0; y < size; y++) {
+            boolean line = true;
+            for (int x = 0; x < size; x++)
+                if (field[x][y] != lastMove) {
+                    line = false;
+                    break;
+                }
+            if (line) {
+                win(lastMove);
+                return;
+            }
+        }
+        // Вертикальные строки
+        for (int x = 0; x < size; x++) {
+            boolean line = true;
+            for (int y = 0; y < size; y++)
+                if (field[x][y] != lastMove) {
+                    line = false;
+                    break;
+                }
+            if (line) {
+                win(lastMove);
+                return;
+            }
+        }
+        // Прямая диагональ
+        boolean line = true;
+        for (int i = 0; i < size; i++) {
+            if (field[i][i] != lastMove) {
+                line = false;
+                break;
+            }
+        }
+        if (line) {
+            win(lastMove);
+            return;
+        }
+        // Обратная диагональ
+        line = true;
+        for (int i = 0; i < size; i++) {
+            if (field[i][size - i - 1] != lastMove) {
+                line = false;
+                break;
+            }
+        }
+        if (line) {
+            win(lastMove);
+            return;
+        }
+        // Проверка на ничью
+        for (int x = 0; x < size; x++)
+            for (int y = 0; y < size; y++)
+                if (field[x][y] == Cell.EMPTY)
+                    return; // Нашли пустую ячейку
+        // Нет пустых ячеек
+        state = State.DRAW; // Ничья
+    }
+
+    /**
+     * Кто-то выйграл
+     *
+     * @param lastMove чей последний ход?
+     */
+    private void win(Cell lastMove) {
+        switch (lastMove) {
+            case X:
+                state = State.X_WINS;
+                break;
+            case O:
+                state = State.O_WINS;
+                break;
+            case EMPTY:
+                throw new RuntimeException("Ошибка в логике игры!" +
+                        "Метод не должен был быть вызван!");
         }
     }
 
@@ -79,6 +166,18 @@ public class Game {
 
     public State getState() {
         return state;
+    }
+
+    @Override
+    public String toString() {
+        StringBuilder sb = new StringBuilder();
+        for (int y = 0; y < size; y++) {
+            for (int x = 0; x < size; x++) {
+                sb.append(field[x][y]);
+            }
+            sb.append("\n");
+        }
+        return sb.toString();
     }
 
     public enum State {

@@ -13,8 +13,13 @@ import view.swing.SwingView;
 public class Main {
     public static void main(String[] args) {
         Game game = new Game();
-        GameView gameView = new ConsoleView();
-        GameView gui = new SwingView();
+        // Если указан ключ "gui" => графический интерфейс
+        boolean gui = false;
+        for (String s : args)
+            if (s.equals("gui")) {
+                gui = true;
+            }
+        GameView gameView = (gui) ? new SwingView() : new ConsoleView();
         while (!game.isOver()) {
             gameView.render(game);
             try {
@@ -24,5 +29,6 @@ public class Main {
                 gameView.reportError(e);
             }
         }
+        gameView.render(game);
     }
 }

@@ -5,6 +5,7 @@ import model.Move;
 import model.UserException;
 import view.GameView;
 
+import java.util.InputMismatchException;
 import java.util.Scanner;
 
 /**
@@ -28,10 +29,21 @@ public class ConsoleView implements GameView {
     }
 
     public Move inputMove() {
-        System.out.print("Введите ход (x,y): ");
+        System.out.print("Введите ход: ");
         Scanner in = new Scanner(System.in);
-        return new Move(in.nextInt(),
-                in.nextInt());
+        while (true) {
+            try {
+                System.out.print(" столбец = ");
+                int x = in.nextInt();
+                System.out.print(" строка = ");
+                int y = in.nextInt();
+                return new Move(x, y);
+            } catch (InputMismatchException |
+                    NumberFormatException ex) {
+                System.out.println(ex.getMessage());
+                in.next();
+            }
+        }
     }
 
     public void reportError(UserException e) {
