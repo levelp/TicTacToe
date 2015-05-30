@@ -20,7 +20,7 @@ public class GameTest {
 
         // Ходим в верхний левый угол
         game.move(0, 0);
-        assertEquals(X, game.field[0][0]);
+        assertEquals(X, game.field[0][0].getCell());
         assertEquals("Теперь ход ноликов", O_MOVE, game.state);
     }
 
@@ -28,7 +28,7 @@ public class GameTest {
     public void testWinX() throws UserException {
         Game game = new Game();
         assertEquals(X_MOVE, game.state);
-        game.field[0] = new Cell[]{X, X, X};
+        game.field[0] = new CellState[]{new CellState(X), new CellState(X), new CellState(X)};
         assertEquals(X_MOVE, game.state);
         game.updateGameState(X);
         assertEquals(X_WINS, game.state);
@@ -40,7 +40,7 @@ public class GameTest {
         assertEquals(X_MOVE, game.state);
         game.move(1, 1);
         assertEquals(O_MOVE, game.state);
-        game.field[0] = new Cell[]{O, O, O};
+        game.field[0] = new CellState[]{new CellState(O), new CellState(O), new CellState(O)};
         assertEquals(O_MOVE, game.state);
         game.updateGameState(O);
         assertEquals(O_WINS, game.state);

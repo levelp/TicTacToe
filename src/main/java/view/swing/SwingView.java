@@ -21,9 +21,6 @@ public class SwingView implements GameView {
         frame.setVisible(true);
     }
 
-    public void render(Game game) {
-    }
-
     public Move inputMove() {
         return null;
     }

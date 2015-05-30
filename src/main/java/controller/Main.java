@@ -19,10 +19,9 @@ public class Main {
             if (s.equals("gui")) {
                 gui = true;
             }
-        GameView gameView = (gui) ? new SwingView(game) : new ConsoleView();
+        GameView gameView = new ConsoleView(game);
         GameView gameView2 = new SwingView(game);
         while (!game.isOver()) {
-            gameView.render(game);
             try {
                 Move move = gameView.inputMove();
                 game.move(move);
@@ -30,6 +29,5 @@ public class Main {
                 gameView.reportError(e);
             }
         }
-        gameView.render(game);
     }
 }

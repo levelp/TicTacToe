@@ -24,8 +24,8 @@ public class MainForm {
 
         GridLayout grid = new GridLayout(game.getSize(), game.getSize());
         fieldPanel.setLayout(grid);
-        for (int x = 0; x < game.getSize(); x++) {
-            for (int y = 0; y < game.getSize(); y++) {
+        for (int y = 0; y < game.getSize(); y++) {
+            for (int x = 0; x < game.getSize(); x++) {
                 fieldPanel.add(new CellView(x, y, game));
             }
         }

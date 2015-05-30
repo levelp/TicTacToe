@@ -12,8 +12,14 @@ public class Game {
      * Координаты отсчитываем от
      * верхнего левого угла
      */
-    public final Cell[][] field;
-    public final List<GameUpdateListener> listeners = new ArrayList<>();
+    public final CellState[][] field;
+
+    /**
+     * Наблюдатели за состоянием игры
+     */
+    public final List<GameUpdateListener> listeners =
+            new ArrayList<>();
+
     /**
      * Размер поля
      */
@@ -25,10 +31,10 @@ public class Game {
 
     public Game(int size) {
         this.size = size;
-        field = new Cell[size][size];
-        for (int x = 0; x < size; x++) {
-            for (int y = 0; y < size; y++) {
-                field[x][y] = Cell.EMPTY;
+        field = new CellState[size][size];
+        for (int y = 0; y < size; y++) {
+            for (int x = 0; x < size; x++) {
+                field[x][y] = new CellState(Cell.EMPTY);
             }
         }
     }
@@ -52,18 +58,18 @@ public class Game {
             throw new UserException("x за пределами поля");
         if (y < 0 || y >= size)
             throw new UserException("y за пределами поля");
-        if (field[x][y] != Cell.EMPTY)
+        if (field[x][y].getCell() != Cell.EMPTY)
             throw new UserException("Ячейка занята x = " + x + " y = " + y);
 
         switch (state) {
             case X_MOVE:
-                field[x][y] = Cell.X;
+                field[x][y].setCell(Cell.X);
                 state = State.O_MOVE;
                 updateGameState(Cell.X);
                 notifyListeners();
                 break;
             case O_MOVE:
-                field[x][y] = Cell.O;
+                field[x][y].setCell(Cell.O);
                 state = State.X_MOVE;
                 updateGameState(Cell.O);
                 notifyListeners();
@@ -89,7 +95,7 @@ public class Game {
         for (int y = 0; y < size; y++) {
             boolean line = true;
             for (int x = 0; x < size; x++)
-                if (field[x][y] != lastMove) {
+                if (field[x][y].getCell() != lastMove) {
                     line = false;
                     break;
                 }
@@ -102,7 +108,7 @@ public class Game {
         for (int x = 0; x < size; x++) {
             boolean line = true;
             for (int y = 0; y < size; y++)
-                if (field[x][y] != lastMove) {
+                if (field[x][y].getCell() != lastMove) {
                     line = false;
                     break;
                 }
@@ -114,7 +120,7 @@ public class Game {
         // Прямая диагональ
         boolean line = true;
         for (int i = 0; i < size; i++) {
-            if (field[i][i] != lastMove) {
+            if (field[i][i].getCell() != lastMove) {
                 line = false;
                 break;
             }
@@ -126,7 +132,7 @@ public class Game {
         // Обратная диагональ
         line = true;
         for (int i = 0; i < size; i++) {
-            if (field[i][size - i - 1] != lastMove) {
+            if (field[i][size - i - 1].getCell() != lastMove) {
                 line = false;
                 break;
             }
@@ -138,7 +144,7 @@ public class Game {
         // Проверка на ничью
         for (int x = 0; x < size; x++)
             for (int y = 0; y < size; y++)
-                if (field[x][y] == Cell.EMPTY)
+                if (field[x][y].getCell() == Cell.EMPTY)
                     return; // Нашли пустую ячейку
         // Нет пустых ячеек
         state = State.DRAW; // Ничья

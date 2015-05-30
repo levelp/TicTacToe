@@ -25,12 +25,20 @@ public class CellView extends JButton {
                 JOptionPane.showMessageDialog(null, e.getMessage(), "Ошибка",
                         JOptionPane.ERROR_MESSAGE);
             }
+            // Если мы уже нажали на эту кнопку =>
+            // ход уже произошел =>
+            // блокируем кнопку
             setEnabled(false);
         });
 
         game.listeners.add(state -> {
             if (game.isOver())
-                setEnabled(false);
+                CellView.this.setEnabled(false);
+        });
+
+        game.field[x][y].addListener(newState -> {
+            setText(newState.toString());
+            setEnabled(false);
         });
     }
 }

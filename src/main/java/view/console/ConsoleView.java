@@ -12,12 +12,17 @@ import java.util.Scanner;
  * Запуск консольного варианта игры
  */
 public class ConsoleView implements GameView {
-    public ConsoleView() {
+    private final Game game;
+
+    public ConsoleView(Game game) {
+        this.game = game;
         System.out.println("Игра Крестики-нолики");
         System.out.println("====================");
+        game.listeners.add(state -> render());
+        render();
     }
 
-    public void render(Game game) {
+    private void render() {
         // Вывод поля
         for (int y = 0; y < game.getSize(); y++) {
             for (int x = 0; x < game.getSize(); x++) {
