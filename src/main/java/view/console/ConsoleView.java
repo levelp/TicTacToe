@@ -16,7 +16,7 @@ public class ConsoleView implements GameView {
 
     public ConsoleView(Game game) {
         this.game = game;
-        System.out.println("Игра Крестики-нолики");
+        System.out.println(Game.GAME_TITLE);
         System.out.println("====================");
         game.listeners.add(state -> render());
         render();

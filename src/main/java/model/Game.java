@@ -8,6 +8,11 @@ import java.util.List;
  */
 public class Game {
     /**
+     * Название игры
+     */
+    public static final String GAME_TITLE = "Игра Крестики-нолики";
+
+    /**
      * Поле игры
      * Координаты отсчитываем от
      * верхнего левого угла
@@ -48,31 +53,54 @@ public class Game {
     }
 
     /**
+     * Проверка координаты на допустимость
+     *
+     * @param coord координата
+     * @param name имя координаты для сообщения об ошибке
+     * @throws UserException если координата за пределами поля
+     */
+    private void validateCoordinate(int coord, String name) throws UserException {
+        if (coord < 0 || coord >= size) {
+            throw new UserException(name + " за пределами поля");
+        }
+    }
+
+    /**
+     * Выполнение хода
+     *
+     * @param x координата по горизонтали
+     * @param y координата по вертикали
+     * @param player символ игрока
+     * @param nextState следующее состояние игры
+     * @throws UserException если ячейка занята
+     */
+    private void performMove(int x, int y, Cell player, State nextState) throws UserException {
+        field[x][y].setCell(player);
+        state = nextState;
+        updateGameState(player);
+        notifyListeners();
+    }
+
+    /**
      * Ход
      *
      * @param x координата по горизонтали (столбец)
      * @param y координата по вертикали (строка)
      */
     public void move(int x, int y) throws UserException {
-        if (x < 0 || x >= size)
-            throw new UserException("x за пределами поля");
-        if (y < 0 || y >= size)
-            throw new UserException("y за пределами поля");
-        if (field[x][y].getCell() != Cell.EMPTY)
+        validateCoordinate(x, "x");
+        validateCoordinate(y, "y");
+
+        if (field[x][y].getCell() != Cell.EMPTY) {
             throw new UserException("Ячейка занята x = " + x + " y = " + y);
+        }
 
         switch (state) {
             case X_MOVE:
-                field[x][y].setCell(Cell.X);
-                state = State.O_MOVE;
-                updateGameState(Cell.X);
-                notifyListeners();
+                performMove(x, y, Cell.X, State.O_MOVE);
                 break;
             case O_MOVE:
-                field[x][y].setCell(Cell.O);
-                state = State.X_MOVE;
-                updateGameState(Cell.O);
-                notifyListeners();
+                performMove(x, y, Cell.O, State.X_MOVE);
                 break;
             default:
                 throw new UserException("Ход невозможен!");
@@ -85,6 +113,22 @@ public class Game {
     }
 
     /**
+     * Проверка линии на заполненность одним символом
+     *
+     * @param lastMove символ для проверки
+     * @param coordinates массив координат для проверки
+     * @return true если вся линия заполнена lastMove
+     */
+    private boolean checkLine(Cell lastMove, int[][] coordinates) {
+        for (int[] coord : coordinates) {
+            if (field[coord[0]][coord[1]].getCell() != lastMove) {
+                return false;
+            }
+        }
+        return true;
+    }
+
+    /**
      * Проверка на окончание игры
      *
      * @param lastMove чей был последний ход?
@@ -93,61 +137,68 @@ public class Game {
         // Проверяем на выйгрыш
         // Горизонтальные строки
         for (int y = 0; y < size; y++) {
-            boolean line = true;
-            for (int x = 0; x < size; x++)
-                if (field[x][y].getCell() != lastMove) {
-                    line = false;
-                    break;
-                }
-            if (line) {
+            int[][] horizontalLine = new int[size][2];
+            for (int x = 0; x < size; x++) {
+                horizontalLine[x] = new int[]{x, y};
+            }
+            if (checkLine(lastMove, horizontalLine)) {
                 win(lastMove);
                 return;
             }
         }
+
         // Вертикальные строки
         for (int x = 0; x < size; x++) {
-            boolean line = true;
-            for (int y = 0; y < size; y++)
-                if (field[x][y].getCell() != lastMove) {
-                    line = false;
-                    break;
-                }
-            if (line) {
+            int[][] verticalLine = new int[size][2];
+            for (int y = 0; y < size; y++) {
+                verticalLine[y] = new int[]{x, y};
+            }
+            if (checkLine(lastMove, verticalLine)) {
                 win(lastMove);
                 return;
             }
         }
+
         // Прямая диагональ
-        boolean line = true;
+        int[][] mainDiagonal = new int[size][2];
         for (int i = 0; i < size; i++) {
-            if (field[i][i].getCell() != lastMove) {
-                line = false;
-                break;
-            }
+            mainDiagonal[i] = new int[]{i, i};
         }
-        if (line) {
+        if (checkLine(lastMove, mainDiagonal)) {
             win(lastMove);
             return;
         }
+
         // Обратная диагональ
-        line = true;
+        int[][] antiDiagonal = new int[size][2];
         for (int i = 0; i < size; i++) {
-            if (field[i][size - i - 1].getCell() != lastMove) {
-                line = false;
-                break;
-            }
+            antiDiagonal[i] = new int[]{i, size - i - 1};
         }
-        if (line) {
+        if (checkLine(lastMove, antiDiagonal)) {
             win(lastMove);
             return;
         }
+
         // Проверка на ничью
-        for (int x = 0; x < size; x++)
-            for (int y = 0; y < size; y++)
-                if (field[x][y].getCell() == Cell.EMPTY)
-                    return; // Нашли пустую ячейку
-        // Нет пустых ячеек
-        state = State.DRAW; // Ничья
+        if (isBoardFull()) {
+            state = State.DRAW;
+        }
+    }
+
+    /**
+     * Проверка, заполнено ли поле полностью
+     *
+     * @return true если нет пустых ячеек
+     */
+    private boolean isBoardFull() {
+        for (int x = 0; x < size; x++) {
+            for (int y = 0; y < size; y++) {
+                if (field[x][y].getCell() == Cell.EMPTY) {
+                    return false;
+                }
+            }
+        }
+        return true;
     }
 
     /**
