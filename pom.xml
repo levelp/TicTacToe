@@ -23,6 +23,20 @@
             <version>4.13.2</version>
             <scope>test</scope>
         </dependency>
+
+        <!-- Cucumber для BDD тестирования -->
+        <dependency>
+            <groupId>io.cucumber</groupId>
+            <artifactId>cucumber-java</artifactId>
+            <version>7.14.0</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>io.cucumber</groupId>
+            <artifactId>cucumber-junit</artifactId>
+            <version>7.14.0</version>
+            <scope>test</scope>
+        </dependency>
     </dependencies>
 
     <build>
